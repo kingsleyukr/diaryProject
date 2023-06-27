@@ -36,7 +36,7 @@ jobs:
           aws configure set default.output json
 
           # Elastic Beanstalk Deployment
-          aws elasticbeanstalk create-application-version --application-name your-application-name --version-label your-version-label --source-bundle S3Bucket=your-bucket-name,S3Key=your-object-key
+          aws elasticbeanstalk create-application-version --region us-east-1 --application-name diaryapp --version-label your-version-label --source-bundle S3Bucket=your-bucket-name,S3Key=your-object-key
           aws elasticbeanstalk update-environment --environment-name your-environment-name --version-label your-version-label
 
           # Or ECS Deployment
