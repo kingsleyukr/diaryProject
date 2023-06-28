@@ -23,7 +23,7 @@ jobs:
         run: docker build -t kcwitch/diaryapp:latest .
 
       - name: Push Docker image to registry
-        run: docker push username/repo:latest
+        run: docker push kcwitch/diaryapp:latest
 
       - name: Deploy to AWS
         run: |
