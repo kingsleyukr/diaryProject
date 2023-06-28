@@ -18,3 +18,11 @@ RUN npm run build
 
 # Set the command to start the app
 CMD ["npm", "start"]
+
+# Tag and push the Docker image to your Docker registry
+ARG REGISTRY_URL
+ARG IMAGE_TAG
+RUN echo "$REGISTRY_URL"
+RUN echo "$IMAGE_TAG"
+RUN docker tag <your_image_name>:latest $REGISTRY_URL/<your_repository_name>:$IMAGE_TAG
+RUN docker push $REGISTRY_URL/diaryapp:$IMAGE_TAG
