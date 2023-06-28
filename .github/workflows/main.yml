@@ -20,7 +20,7 @@ jobs:
         run: aws configure set region us-east-1
 
       - name: Login to Amazon ECR
-        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <your-ecr-registry-url>
+        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/l6y6s0h8/app
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
