@@ -20,7 +20,7 @@ jobs:
         run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
 
       - name: Build Docker image
-        run: docker build -t kcwitch/repo:latest .
+        run: docker build -t kcwitch/diaryapp:latest .
 
       - name: Push Docker image to registry
         run: docker push username/repo:latest
