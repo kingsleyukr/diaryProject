@@ -20,14 +20,17 @@ jobs:
         run: aws configure set region us-east-1
 
       - name: Login to Amazon ECR
-        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 827061514539.dkr.ecr.us-east-1.amazonaws.com/app
+        run: |
+          echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 827061514539.dkr.ecr.us-east-1.amazonaws.com
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: kcwitch/diaryapp:latest
+      - name: Build Docker image
+        run: docker build -t app .
+
+      - name: Tag Docker image
+        run: docker tag app:latest 827061514539.dkr.ecr.us-east-1.amazonaws.com/app:latest
+
+      - name: Push Docker image to ECR
+        run: docker push 827061514539.dkr.ecr.us-east-1.amazonaws.com/app:latest
 
       - name: Deploy to AWS
         run: |
