@@ -13,43 +13,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
-          tags: your-docker-repo/your-image-name:${{ github.sha }}
+          tags: kcwitch/diaryapp:latest
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: your-aws-region
-
-      - name: Authenticate with Docker registry
-        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login ${{ secrets.DOCKER_REGISTRY_URL }} -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-
-      - name: Push Docker image to registry
-        run: docker push ${{ secrets.DOCKER_REGISTRY_URL }}/<your_repository_name>:${{ github.sha }}
-
-      - name: Create source bundle
+      - name: Deploy to AWS
         run: |
-          zip -r source-bundle.zip . -x "*.git*" -x "node_modules/*" -x "build/*"
-
-      - name: Upload source bundle to S3
-        run: aws s3 cp source-bundle.zip s3://your-s3-bucket/source-bundle.zip
-
-      - name: Deploy to AWS Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk create-application-version --application-name your-app-name \
-            --version-label ${{ github.sha }} --source-bundle S3Bucket=your-s3-bucket,S3Key=source-bundle.zip
-
-          aws elasticbeanstalk update-environment --application-name your-app-name \
-            --environment-name your-environment-name --version-label ${{ github.sha }}
-
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set region us-east-1
+          aws configure set output json
+          # Elastic Beanstalk Deployment
+          aws elasticbeanstalk create-application-version --application-name your-application-name --version-label your-version-label --source-bundle S3Bucket=your-bucket-name,S3Key=your-object-key
+          aws elasticbeanstalk update-environment --environment-name your-environment-name --version-label your-version-label
+          # Or ECS Deployment
+          # Replace the commands below with your ECS deployment steps
+          # aws ecs update-service --cluster your-cluster-name --service your-service-name --force-new-deployment
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
